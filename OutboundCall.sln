@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.1.32319.34
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutboundCall", "OutboundCall\OutboundCall.csproj", "{9897811A-1A3A-45E9-AE69-7398349E9207}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9897811A-1A3A-45E9-AE69-7398349E9207}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9897811A-1A3A-45E9-AE69-7398349E9207}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9897811A-1A3A-45E9-AE69-7398349E9207}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9897811A-1A3A-45E9-AE69-7398349E9207}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {84A77E96-D956-43A1-9962-21FE2624F960}
+	EndGlobalSection
+EndGlobal
