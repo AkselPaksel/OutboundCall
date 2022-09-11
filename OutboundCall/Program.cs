@@ -21,13 +21,18 @@ namespace OutboundCall
 
             Configure.RunConfig();
 
+            OutboundApi outboundApi = new OutboundApi();
             NotificationsApi notificationsApi = new NotificationsApi();
 
             Channel? channel = notificationsApi.PostNotificationsChannels();
             Notification.SetupNotifications(notificationsApi, channel);
+            var campaign = outboundApi.GetOutboundCampaign(ConfigurationManager.AppSettings["campaignId"]);
+            ContactLists.SetContactList(outboundApi, campaign, "+4741347834");
+            Outbound.StartOutbound("face6225-3995-4ad9-a5af-c6b7f0d21a53", "face6225-3995-4ad9-a5af-c6b7f0d21a53", outboundApi);
 
-            Outbound.StartOutbound("","");
-            //Websocket.RunWebsocket(channel).Wait();
+            //Websocket.RunWebsocket(channel, outboundApi).Wait();
+
+            Console.ReadLine();
         }
     }
 }

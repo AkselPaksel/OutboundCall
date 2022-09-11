@@ -12,14 +12,20 @@ namespace OutboundCall
 {
     internal class Outbound
     {
-        internal static void StartOutbound(string conversationId, string agentId)
+        internal static void StartOutbound(string conversationId, string agentId, OutboundApi outboundApi)
         {
-            OutboundApi outboundApi = new OutboundApi();
-            Campaign campaign = outboundApi.GetOutboundCampaign(ConfigurationManager.AppSettings["campaignId"]);
-            campaign.Version++;
+            Campaign campaign = outboundApi.GetOutboundCampaign(ConfigurationManager.AppSettings["campaignId"]);;
+            campaign.CampaignStatus = Campaign.CampaignStatusEnum.On;
+            campaign.CallerName = conversationId + ";" + agentId;
+            try
+            {
+                outboundApi.PutOutboundCampaign(ConfigurationManager.AppSettings["campaignId"], campaign);
+                campaign.CampaignStatus = Campaign.CampaignStatusEnum.Off;
+                campaign.Version++;
+                outboundApi.PutOutboundCampaign(ConfigurationManager.AppSettings["campaignId"], campaign);
 
-
-            outboundApi.PutOutboundCampaign(ConfigurationManager.AppSettings["campaignId"], campaign);
+            }
+            catch (Exception ex) { Console.WriteLine(ex); }
         }
     }
 }

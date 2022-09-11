@@ -6,12 +6,14 @@ using System.Threading.Tasks;
 using System.Net.WebSockets;
 using PureCloudPlatform.Client.V2.Model;
 using Newtonsoft.Json.Linq;
+using PureCloudPlatform.Client.V2.Api;
+using System.Configuration;
 
 namespace OutboundCall
 {
     internal class Websocket
     {
-        internal static async Task RunWebsocket(Channel channel)
+        internal static async Task RunWebsocket(Channel channel, OutboundApi outboundApi)
         {
             try
             {
@@ -25,7 +27,7 @@ namespace OutboundCall
                     string rawOutput = "";
                     string conversationId = "";
                     // key is conversationId. Bool in tuplevalue is if customer has been sent survey. String in tuplevalue is agentId
-                    Dictionary<string, (bool, string)> conversationSurveyDict = new Dictionary<string, (bool, string)>();
+                    Dictionary<string, (bool, string, string)> conversationSurveyDict = new Dictionary<string, (bool, string, string)>();
                     WebSocketReceiveResult result = null;
                     ArraySegment<byte> bytesReceived = new ArraySegment<byte>(new byte[1024]);
 
@@ -44,6 +46,9 @@ namespace OutboundCall
                                 Console.WriteLine("Over");
                             }
                         } while (!result.EndOfMessage);
+
+
+
                         if (!String.IsNullOrEmpty(rawOutput))
                         {
                             var parsedOutput = JObject.Parse(rawOutput);
@@ -53,7 +58,7 @@ namespace OutboundCall
                                 conversationId = parsedOutput["eventBody"]["id"].ToString();
                                 if (!conversationSurveyDict.ContainsKey(conversationId))
                                 {
-                                    conversationSurveyDict.Add(conversationId, (false, ""));
+                                    conversationSurveyDict.Add(conversationId, (false, "", ""));
                                     // Delete conversationId from Dictionary
                                     new Thread(() =>
                                     {
@@ -72,34 +77,60 @@ namespace OutboundCall
                                     }
                                 }
 
+
+
                                 try
                                 {
                                     foreach (var participant in (JArray)parsedOutput["eventBody"]["participants"])
                                     {
+                                        
                                         if (participant["purpose"].ToString() == "customer" &&
-                                            participant["calls"][0]["state"].ToString() == "connected" && String.IsNullOrEmpty(conversationSurveyDict[conversationId].Item2))
+                                            participant["calls"][0]["state"].ToString() == "connected")
                                         {
-                                            foreach (var agentParticipant in (JArray)parsedOutput["eventBody"]["participants"])
+                                            // Get agentId
+                                            if (String.IsNullOrEmpty(conversationSurveyDict[conversationId].Item2))
                                             {
-                                                if (agentParticipant["purpose"].ToString() == "agent")
+                                                foreach (var agentParticipant in (JArray)parsedOutput["eventBody"]["participants"])
                                                 {
-                                                    conversationSurveyDict[conversationId] = (conversationSurveyDict[conversationId].Item1, agentParticipant["userId"].ToString());
+                                                    if (agentParticipant["purpose"].ToString() == "agent")
+                                                    {
+                                                        conversationSurveyDict[conversationId] = (conversationSurveyDict[conversationId].Item1, agentParticipant["userId"].ToString(), conversationSurveyDict[conversationId].Item3);
+                                                    }
+                                                }
+                                            }
+                                            // Get phoneNumber
+                                            if (String.IsNullOrEmpty(conversationSurveyDict[conversationId].Item3))
+                                            {
+                                                foreach (var customerParticipant in (JArray)parsedOutput["eventBody"]["participants"])
+                                                {
+                                                    if (customerParticipant["purpose"].ToString() == "customer")
+                                                    {
+                                                        conversationSurveyDict[conversationId] = (conversationSurveyDict[conversationId].Item1, conversationSurveyDict[conversationId].Item2, customerParticipant["address"].ToString());
+                                                    }
                                                 }
                                             }
                                         }
+
+
+
                                         if (Disconnected.IsDisconnected(participant))
                                         {
-                                            Console.WriteLine("Run outbound" +
-                                                "\nConversationId: " + conversationId +
-                                                "\nAgentId: " + conversationSurveyDict[conversationId].Item2);
-                                            conversationSurveyDict[conversationId] = (true, conversationSurveyDict[conversationId].Item2);
+                                            var campaign = outboundApi.GetOutboundCampaign(ConfigurationManager.AppSettings["campaignId"]);
+                                            ContactLists.SetContactList(outboundApi, campaign, conversationSurveyDict[conversationId].Item3);
+                                            Outbound.StartOutbound(conversationId, conversationSurveyDict[conversationId].Item2, outboundApi);
+                                            //Console.WriteLine("Run outbound" +
+                                            //    "\nConversationId: " + conversationId +
+                                            //    "\nAgentId: " + conversationSurveyDict[conversationId].Item2);
+                                            conversationSurveyDict[conversationId] = (true, conversationSurveyDict[conversationId].Item2, conversationSurveyDict[conversationId].Item3);
                                         }
+
+
                                     }
                                 }
                                 catch (Exception ex) { Console.WriteLine(ex); }
                             }
+                            rawOutput = "";
                         }
-                        rawOutput = "";
                     }
                 }
             }
