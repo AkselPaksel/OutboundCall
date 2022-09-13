@@ -3,7 +3,7 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.1.32319.34
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OutboundCall", "OutboundCall\OutboundCall.csproj", "{9897811A-1A3A-45E9-AE69-7398349E9207}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OutboundCall", "OutboundCall\OutboundCall.csproj", "{9897811A-1A3A-45E9-AE69-7398349E9207}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
