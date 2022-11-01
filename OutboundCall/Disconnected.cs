@@ -1,19 +1,13 @@
-﻿using Newtonsoft.Json.Linq;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
+﻿
 namespace OutboundCall
 {
     internal class Disconnected
     {
-        internal static bool IsDisconnected(JToken participant)
+        internal static bool IsDisconnected(ResponseSchema.Participant participant)
         {
-            if (participant["purpose"].ToString() == "customer")
+            if (participant.purpose == "customer")
             {
-                if (participant["calls"][0]["state"].ToString() == "disconnected")
+                if (participant.calls[0].state == "disconnected")
                 {
                     return true;
                 }

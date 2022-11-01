@@ -1,11 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using PureCloudPlatform.Client.V2.Api;
+﻿using PureCloudPlatform.Client.V2.Api;
 using PureCloudPlatform.Client.V2.Model;
-using System.Configuration;
 
 namespace OutboundCall
 {

@@ -6,6 +6,7 @@ using System.Configuration;
 using System.Net.WebSockets;
 using System.Text;
 
+
 namespace OutboundCall
 {
     public class OutboundCall
@@ -22,15 +23,13 @@ namespace OutboundCall
             Configure.RunConfig();
 
             OutboundApi outboundApi = new OutboundApi();
+            AnalyticsApi analyticsApi = new AnalyticsApi();
             NotificationsApi notificationsApi = new NotificationsApi();
 
             Channel? channel = notificationsApi.PostNotificationsChannels();
             Notification.SetupNotifications(notificationsApi, channel);
-            var campaign = outboundApi.GetOutboundCampaign(ConfigurationManager.AppSettings["campaignId"]);
-            ContactLists.SetContactList(outboundApi, campaign, "+4741347834");
-            Outbound.StartOutbound("face6225-3995-4ad9-a5af-c6b7f0d21a53", "face6225-3995-4ad9-a5af-c6b7f0d21a53", outboundApi);
 
-            //Websocket.RunWebsocket(channel, outboundApi).Wait();
+            Websocket.RunWebsocket(channel, outboundApi, analyticsApi).Wait();
 
             Console.ReadLine();
         }
