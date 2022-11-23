@@ -1,20 +1,14 @@
-﻿using PureCloudPlatform.Client.V2.Api;
-using PureCloudPlatform.Client.V2.Model;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using PureCloudPlatform.Client.V2.Model;
 
 namespace OutboundCall
 {
-    internal class Quarantined
+    internal class ConversationBody
     {
-        public static bool IsQuarantined(string phoneNumber, AnalyticsApi analyticsApi)
+        public static ConversationQuery CreateConversationBody(string phoneNumber, DateTime quarantineDateFrom, DateTime quarantineDateTo)
         {
-            
-            ConversationQuery conversationQuery = new ConversationQuery()
+            return new ConversationQuery()
             {
+                Interval = quarantineDateFrom.Year + "-" + quarantineDateFrom.Month + "-" + quarantineDateFrom.Day + "T23:00:00.000Z/" + quarantineDateTo.Year + "-" + quarantineDateTo.Month + "-" + quarantineDateTo.Day + "T23:00:00.000Z",
                 SegmentFilters = new List<SegmentDetailQueryFilter>()
                 {
                     new SegmentDetailQueryFilter()
@@ -33,14 +27,6 @@ namespace OutboundCall
                     }
                 }
             };
-
-            var analyticsQuery = analyticsApi.PostAnalyticsConversationsDetailsQuery(conversationQuery);
-            var some = analyticsQuery.Conversations.Where(b => !String.IsNullOrEmpty(b.ExternalTag)).ToList();
-            some[0].ConversationEnd;
-            DateTime? something = some[0].ConversationEnd;
-            DateTime.Now;
-
-            return (analyticsQuery.Conversations.Where(b => !String.IsNullOrEmpty(b.ExternalTag)) != null);
         }
     }
 }

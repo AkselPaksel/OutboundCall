@@ -1,11 +1,5 @@
-﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
-using PureCloudPlatform.Client.V2.Api;
-using PureCloudPlatform.Client.V2.Model;
+﻿using System.Collections.Specialized;
 using System.Configuration;
-using System.Net.WebSockets;
-using System.Text;
-
 
 namespace OutboundCall
 {
@@ -13,25 +7,34 @@ namespace OutboundCall
     {
         static void Main(string[] args)
         {
-            Console.WriteLine("Starting program ... ...");
-            // Set configuration file
-            //AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", @"..\App.config");
+            Log.Logger.Info("Application starting ... .");
 
 
+            AppDomain.CurrentDomain.SetData("APP_CONFIG_FILE", @"..\App.config");
 
-
+            API.InitializeApis();
             Configure.RunConfig();
 
-            OutboundApi outboundApi = new OutboundApi();
-            AnalyticsApi analyticsApi = new AnalyticsApi();
-            NotificationsApi notificationsApi = new NotificationsApi();
+            
+            // Task for updating OAuth token and clearing contact lists
+            Task.Run(() =>
+            {
+                int count = int.Parse(ConfigurationManager.AppSettings["contactListPeriod"]);
+                while (true)
+                {
+                    count--;
+                    Thread.Sleep(86400 * 1000);
+                    Configure.RunConfig();
+                    if (count == 0)
+                    {
+                        count = int.Parse(ConfigurationManager.AppSettings["contactListPeriod"]);
+                        Contacts.ClearContacts();
+                    }
+                }
+            });
 
-            Channel? channel = notificationsApi.PostNotificationsChannels();
-            Notification.SetupNotifications(notificationsApi, channel);
-
-            Websocket.RunWebsocket(channel, outboundApi, analyticsApi).Wait();
-
+            WebsocketResponse.RunWebSocket();
             Console.ReadLine();
-        }
+        }    
     }
 }

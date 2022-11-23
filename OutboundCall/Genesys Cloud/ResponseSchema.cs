@@ -1,10 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace OutboundCall
+﻿namespace OutboundCall
 {
     internal class ResponseSchema
     {
@@ -31,6 +25,7 @@ namespace OutboundCall
             public DateTime connectedTime { get; set; }
             public string userId { get; set; }
             public string externalContactId { get; set; }
+            public Wrapup wrapup { get; set; }
             public string name { get; set; }
             public string queueId { get; set; }
             public string purpose { get; set; }
@@ -44,9 +39,18 @@ namespace OutboundCall
             public Workflow workflow { get; set; }
             public Conversationroutingdata conversationRoutingData { get; set; }
         }
+        public class Wrapup
+        {
+            public string code { get; set; }
+            public string notes { get; set; }
+            public int durationSeconds { get; set; }
+            public DateTime endTime { get; set; }
+            public Additionalproperties2 additionalProperties { get; set; }
+        }
 
         public class Attributes
         {
+            public string CallSurveyCulture { get; set; }
         }
 
         public class Additionalproperties
